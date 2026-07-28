@@ -6,8 +6,10 @@ import { site } from "@/lib/site-config";
 export default function InlineConsultForm() {
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
@@ -19,13 +21,28 @@ export default function InlineConsultForm() {
       form.elements.namedItem("message") as HTMLTextAreaElement
     ).value;
 
-    const subject = encodeURIComponent(`[무료 상담 신청] ${name}`);
-    const body = encodeURIComponent(
-      `성함: ${name}\n연락처: ${contact}\n지역: ${region}\n문의내용: ${message}`
-    );
+    setSubmitting(true);
+    setError("");
 
-    window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;
-    setSubmitted(true);
+    try {
+      const res = await fetch("/api/consult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, contact, region, message }),
+      });
+
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError(
+        "접수 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 전화로 문의해주세요."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -38,11 +55,10 @@ export default function InlineConsultForm() {
       {submitted ? (
         <div className="mt-6 py-6 text-center">
           <p className="text-base font-bold text-blue-700">
-            메일 작성창이 열렸습니다.
+            상담 신청이 접수되었습니다.
           </p>
           <p className="mt-2 text-xs leading-5 text-slate-500">
-            내용을 확인 후 전송해주시면 확인되는대로 연락드립니다. 급하시면
-            바로 전화 주세요.
+            빠르게 확인 후 연락드리겠습니다. 급하시면 바로 전화 주세요.
           </p>
           <a
             href={site.phoneHref}
@@ -90,12 +106,13 @@ export default function InlineConsultForm() {
             완료 후 1년간 보관 후 파기됩니다. 개인정보 수집 및 이용에
             동의합니다.
           </label>
+          {error && <p className="text-xs font-medium text-red-500">{error}</p>}
           <button
             type="submit"
-            disabled={!agreed}
+            disabled={!agreed || submitting}
             className="w-full rounded-full bg-orange-500 py-3 text-sm font-bold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            상담 신청하기
+            {submitting ? "접수 중..." : "상담 신청하기"}
           </button>
         </form>
       )}

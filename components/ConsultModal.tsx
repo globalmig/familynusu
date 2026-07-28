@@ -13,17 +13,20 @@ export default function ConsultModal({
 }) {
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
       setSubmitted(false);
       setAgreed(false);
+      setError("");
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
@@ -35,13 +38,28 @@ export default function ConsultModal({
       form.elements.namedItem("message") as HTMLTextAreaElement
     ).value;
 
-    const subject = encodeURIComponent(`[무료 상담 신청] ${name}`);
-    const body = encodeURIComponent(
-      `성함: ${name}\n연락처: ${contact}\n지역: ${region}\n문의내용: ${message}`
-    );
+    setSubmitting(true);
+    setError("");
 
-    window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;
-    setSubmitted(true);
+    try {
+      const res = await fetch("/api/consult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, contact, region, message }),
+      });
+
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError(
+        "접수 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 전화로 문의해주세요."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -69,11 +87,10 @@ export default function ConsultModal({
         {submitted ? (
           <div className="py-8 text-center">
             <p className="text-lg font-semibold text-blue-700">
-              메일 작성창이 열렸습니다.
+              상담 신청이 접수되었습니다.
             </p>
             <p className="mt-2 text-sm text-slate-500">
-              내용을 확인하고 전송해주시면 빠르게 연락드리겠습니다. 급하시면
-              바로 전화 주세요.
+              빠르게 확인 후 연락드리겠습니다. 급하시면 바로 전화 주세요.
             </p>
             <a
               href={site.phoneHref}
@@ -121,12 +138,15 @@ export default function ConsultModal({
               완료 후 1년간 보관 후 파기됩니다. 개인정보 수집 및 이용에
               동의합니다.
             </label>
+            {error && (
+              <p className="text-xs font-medium text-red-500">{error}</p>
+            )}
             <button
               type="submit"
-              disabled={!agreed}
+              disabled={!agreed || submitting}
               className="w-full rounded-full bg-orange-500 py-3 font-bold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              상담 신청하기
+              {submitting ? "접수 중..." : "상담 신청하기"}
             </button>
           </form>
         )}

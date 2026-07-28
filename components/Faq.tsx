@@ -37,7 +37,7 @@ export default function Faq() {
           <p className="text-sm font-bold text-orange-500">
             자주 묻는 질문
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             궁금한 점을 미리 확인해보세요
           </h2>
         </Reveal>

@@ -35,7 +35,7 @@ export default function WhyUs() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <Reveal>
           <p className="text-sm font-bold text-orange-500">WHY?</p>
-          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             왜 패밀리누수탐지인가요?
           </h2>
           <p className="mt-2 text-sm text-slate-500">
@@ -44,8 +44,43 @@ export default function WhyUs() {
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="mt-8 overflow-x-auto rounded-2xl ring-1 ring-slate-100">
-            <table className="w-full min-w-[560px] border-collapse text-sm">
+          {/* Mobile: stacked cards */}
+          <div className="mt-8 space-y-3 sm:hidden">
+            {ROWS.map((row) => (
+              <div
+                key={row.label}
+                className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100"
+              >
+                <p className="text-sm font-semibold text-slate-700">
+                  {row.label}
+                </p>
+                <div className="mt-3 flex flex-col gap-2">
+                  <div className="rounded-lg border border-slate-200 bg-white p-3">
+                    <p className="text-xs font-medium text-slate-400">
+                      일반 업체
+                    </p>
+                    <span className="mt-1 flex items-center gap-1.5 text-sm text-slate-400">
+                      <TbCircleXFilled className="h-4 w-4 shrink-0 text-slate-300" />
+                      {row.other}
+                    </span>
+                  </div>
+                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                    <p className="text-xs font-medium text-blue-700">
+                      패밀리누수탐지
+                    </p>
+                    <span className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-blue-800">
+                      <TbCircleCheckFilled className="h-4 w-4 shrink-0 text-blue-600" />
+                      {row.ours}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tablet & up: table */}
+          <div className="mt-8 hidden overflow-x-auto rounded-2xl ring-1 ring-slate-100 sm:block">
+            <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-slate-50 text-slate-500">
                   <th className="p-4 text-left font-semibold">비교 항목</th>

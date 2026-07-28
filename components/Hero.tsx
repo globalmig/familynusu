@@ -23,7 +23,7 @@ export default function Hero() {
             서울·경기 전 지역 · 24시간 출동
           </p>
 
-          <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-black leading-tight break-keep sm:text-5xl">
             정확한 진단이 곧
             <br />
             <span className="text-orange-300">최소한의 공사</span>로

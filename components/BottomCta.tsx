@@ -15,11 +15,13 @@ export default function BottomCta() {
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
             <TbHeadset className="h-7 w-7 text-orange-300" />
           </span>
-          <h2 className="text-2xl font-black sm:text-3xl">
+          <h2 className="text-2xl font-black break-keep sm:text-3xl">
             더 궁금한 점이 있으신가요?
           </h2>
           <p className="text-sm text-blue-100 sm:text-base">
-            지금 바로 연락주세요. 24시간 친절하게 안내해드리겠습니다.
+            지금 바로 연락주세요.
+            <br />
+            24시간 친절하게 안내해드리겠습니다.
           </p>
           <p className="text-2xl font-black text-orange-300">{site.phone}</p>
           <div className="flex flex-col gap-3 sm:flex-row">

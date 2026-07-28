@@ -31,7 +31,7 @@ export default function ServiceArea() {
           <p className="text-sm font-bold text-orange-500">
             출동 가능 지역
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             {site.serviceArea} 24시간 출동
           </h2>
         </Reveal>

@@ -49,7 +49,7 @@ export default function Services() {
           <p className="text-sm font-bold text-orange-500">
             전문 서비스 영역
           </p>
-          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             어떤 문제든 패밀리누수탐지가 정확하게 해결합니다
           </h2>
         </Reveal>

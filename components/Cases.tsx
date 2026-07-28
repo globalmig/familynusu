@@ -16,7 +16,7 @@ export default function Cases() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal>
           <p className="text-sm font-bold text-orange-500">작업 분야</p>
-          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             이런 현장을 자주 만납니다
           </h2>
           <p className="mt-2 text-sm text-slate-500">
@@ -36,7 +36,7 @@ export default function Cases() {
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-transparent" />
-                <p className="absolute inset-x-0 bottom-0 p-4 text-base font-bold text-white drop-shadow sm:p-5 sm:text-lg">
+                <p className="absolute inset-x-0 bottom-0 p-4 text-base font-bold text-white drop-shadow break-keep sm:p-5 sm:text-lg">
                   {c.title}
                 </p>
               </div>

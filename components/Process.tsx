@@ -24,7 +24,7 @@ export default function Process() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal>
           <p className="text-sm font-bold text-orange-500">진행 절차</p>
-          <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             간단한 3단계로 해결합니다
           </h2>
         </Reveal>

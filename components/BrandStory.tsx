@@ -24,7 +24,7 @@ export default function BrandStory() {
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         <Reveal>
           <p className="text-sm font-bold text-orange-300">BRAND STORY</p>
-          <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black leading-tight break-keep sm:text-3xl">
             &quot;가족&quot;에게 추천하듯,
             <br />
             정직하게 진단하고 시공합니다

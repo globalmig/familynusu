@@ -7,12 +7,10 @@ import { useConsult } from "./ConsultProvider";
 
 const NAV_ITEMS = [
   { href: "#services", label: "서비스소개" },
-  { href: "#promise", label: "우리의 약속" },
-  { href: "#why", label: "WHY?" },
-  { href: "#area", label: "출동 가능 지역" },
+  { href: "#promise", label: "고객님과의 약속" },
+  { href: "#why", label: "패밀리누수탐지?" },
+  { href: "#area", label: "방문 가능 지역" },
   { href: "#cases", label: "작업 사례" },
-  { href: "#reviews", label: "이용 안내" },
-  { href: "#testimonials", label: "고객 후기" },
   { href: "#faq", label: "자주 묻는 질문" },
 ];
 

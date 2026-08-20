@@ -23,7 +23,16 @@ export default function PromiseStrip() {
   return (
     <section id="promise" className="bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Reveal>
+          <p className="text-sm font-bold text-orange-500">
+            고객님과의 약속
+          </p>
+          <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
+            패밀리누수탐지가 지키는 3가지 약속
+          </h2>
+        </Reveal>
+
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {PROMISES.map((item, i) => (
             <Reveal key={item.title} delay={i * 100}>
               <div className="flex h-full items-start gap-4 rounded-3xl border border-slate-100 bg-slate-50 p-5 shadow-sm transition-shadow hover:shadow-md">

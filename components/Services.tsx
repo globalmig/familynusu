@@ -57,7 +57,12 @@ export default function Services() {
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((service, i) => (
             <Reveal key={service.title} delay={i * 80}>
-              <div className="h-full rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 transition-all hover:-translate-y-1 hover:shadow-lg">
+              <a
+                href="https://blog.naver.com/familydetector"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block h-full rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100 transition-all hover:-translate-y-1 hover:shadow-lg"
+              >
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
                   <service.icon className="h-6 w-6" />
                 </span>
@@ -67,7 +72,7 @@ export default function Services() {
                 <p className="mt-1.5 text-sm leading-6 text-slate-500">
                   {service.desc}
                 </p>
-              </div>
+              </a>
             </Reveal>
           ))}
         </div>

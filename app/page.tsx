@@ -8,12 +8,13 @@ import WhyUs from "@/components/WhyUs";
 import ServiceArea from "@/components/ServiceArea";
 import Process from "@/components/Process";
 import Cases from "@/components/Cases";
-import Reviews from "@/components/Reviews";
 import Faq from "@/components/Faq";
 import BottomCta from "@/components/BottomCta";
 import Footer from "@/components/Footer";
 import FloatingActions from "@/components/FloatingActions";
 import LiveActivityToast from "@/components/LiveActivityToast";
+
+export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
@@ -29,7 +30,6 @@ export default function Home() {
         <ServiceArea />
         <Process />
         <Cases />
-        <Reviews />
         <Faq />
         <BottomCta />
       </main>

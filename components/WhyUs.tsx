@@ -13,9 +13,9 @@ const ROWS = [
     ours: "필요한 부분만 최소한으로",
   },
   {
-    label: "장비",
+    label: "탐지장비",
     other: "일반 장비",
-    ours: "최첨단 누수탐지 전용 장비",
+    ours: "독일 구터만 탐지기·청음기 등 전문 장비",
   },
   {
     label: "출동 범위·시간",
@@ -24,8 +24,8 @@ const ROWS = [
   },
   {
     label: "보험 서류",
-    other: "미지원",
-    ours: "기술소견서 등 서류 지원",
+    other: "한정지원",
+    ours: "상황에 맞게 최대금액지원",
   },
 ];
 
@@ -34,7 +34,7 @@ export default function WhyUs() {
     <section id="why" className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <Reveal>
-          <p className="text-sm font-bold text-orange-500">WHY?</p>
+          <p className="text-sm font-bold text-orange-500">패밀리누수탐지?</p>
           <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             왜 패밀리누수탐지인가요?
           </h2>

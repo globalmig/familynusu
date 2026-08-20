@@ -7,8 +7,8 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-blue-950 text-white">
       <Image
-        src="/hero.png"
-        alt="최첨단 누수탐지 장비로 배관 누수 지점을 정밀 진단하는 현장"
+        src="/hero2.png"
+        alt="청음기로 싱크대 하부 배관의 누수를 정밀 진단하는 패밀리누수탐지 기술자"
         fill
         priority
         sizes="100vw"

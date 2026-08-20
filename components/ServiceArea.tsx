@@ -29,7 +29,7 @@ export default function ServiceArea() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal>
           <p className="text-sm font-bold text-orange-500">
-            출동 가능 지역
+            방문 가능 지역
           </p>
           <h2 className="mt-2 text-2xl font-black text-slate-900 break-keep sm:text-3xl">
             {site.serviceArea} 24시간 출동

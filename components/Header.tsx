@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { TbMenu2, TbX } from "react-icons/tb";
 import { site } from "@/lib/site-config";
 import { useConsult } from "./ConsultProvider";
@@ -21,8 +22,15 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="/" className="text-lg font-black text-blue-800">
-          {site.name}
+        <a href="/" className="flex shrink-0 items-center">
+          <Image
+            src="/logo.png"
+            alt={`${site.name} 로고`}
+            width={1274}
+            height={369}
+            priority
+            className="h-9 w-auto sm:h-11"
+          />
         </a>
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 lg:flex">

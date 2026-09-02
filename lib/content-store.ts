@@ -48,19 +48,59 @@ export function createContentStore(namespace: string) {
   }
 
   async function remove(id: string): Promise<void> {
+    return removeMany([id]);
+  }
+
+  async function removeMany(ids: string[]): Promise<void> {
+    if (ids.length === 0) return;
     const { env } = await getCloudflareContext({ async: true });
-    const existing = await env.CONTENT_KV.get<ContentItem>(itemKey(id), "json");
-    const ids = (await env.CONTENT_KV.get<string[]>(indexKey, "json")) ?? [];
-    const nextIds = ids.filter((existingId) => existingId !== id);
+    const removeSet = new Set(ids);
+
+    const [existingItems, currentIds] = await Promise.all([
+      env.CONTENT_KV.get<ContentItem>(ids.map(itemKey), "json"),
+      env.CONTENT_KV.get<string[]>(indexKey, "json"),
+    ]);
+    const nextIds = (currentIds ?? []).filter((id) => !removeSet.has(id));
 
     await Promise.all([
-      env.CONTENT_KV.delete(itemKey(id)),
+      ...ids.map((id) => env.CONTENT_KV.delete(itemKey(id))),
       env.CONTENT_KV.put(indexKey, JSON.stringify(nextIds)),
-      existing
-        ? env.CONTENT_BUCKET.delete(existing.imageKey)
-        : Promise.resolve(),
+      ...ids.map((id) => {
+        const existing = existingItems.get(itemKey(id));
+        return existing
+          ? env.CONTENT_BUCKET.delete(existing.imageKey)
+          : Promise.resolve();
+      }),
     ]);
   }
 
-  return { list, create, remove };
+  async function get(id: string): Promise<ContentItem | null> {
+    const { env } = await getCloudflareContext({ async: true });
+    return (await env.CONTENT_KV.get<ContentItem>(itemKey(id), "json")) ?? null;
+  }
+
+  async function update(
+    id: string,
+    input: { title: string; description: string; imageKey?: string }
+  ): Promise<ContentItem | null> {
+    const { env } = await getCloudflareContext({ async: true });
+    const existing = await env.CONTENT_KV.get<ContentItem>(itemKey(id), "json");
+    if (!existing) return null;
+
+    const updated: ContentItem = {
+      ...existing,
+      title: input.title,
+      description: input.description,
+      imageKey: input.imageKey ?? existing.imageKey,
+    };
+
+    await env.CONTENT_KV.put(itemKey(id), JSON.stringify(updated));
+    if (input.imageKey && input.imageKey !== existing.imageKey) {
+      await env.CONTENT_BUCKET.delete(existing.imageKey);
+    }
+
+    return updated;
+  }
+
+  return { list, create, remove, removeMany, get, update };
 }

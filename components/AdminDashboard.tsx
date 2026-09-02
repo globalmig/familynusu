@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState, type FormEvent } from "react";
+import { TbPencil, TbTrash } from "react-icons/tb";
 import type { ContentItem } from "@/lib/content-store";
 import type { ContentNamespace } from "@/lib/content";
 
@@ -37,8 +38,12 @@ export default function AdminDashboard({
   const [items, setItems] = useState(initialItems);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deletingSelection, setDeletingSelection] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState("");
 
   const filteredItems = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -74,18 +79,74 @@ export default function AdminDashboard({
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm(`이 ${labels.itemLabel}를 삭제할까요?`)) return;
-    setDeletingId(id);
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
 
+  async function handleDeleteSelected() {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`선택한 ${selectedIds.size}개의 ${labels.itemLabel}를 삭제할까요?`))
+      return;
+
+    setDeletingSelection(true);
     try {
-      const res = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+      const res = await fetch(apiBase, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      });
       if (!res.ok) throw new Error();
-      setItems((prev) => prev.filter((item) => item.id !== id));
+      setItems((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+      setSelectedIds(new Set());
     } catch {
       alert("삭제 중 오류가 발생했습니다.");
     } finally {
-      setDeletingId(null);
+      setDeletingSelection(false);
+    }
+  }
+
+  async function handleEditSubmit(
+    e: FormEvent<HTMLFormElement>,
+    id: string
+  ) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    setEditSubmitting(true);
+    setEditError("");
+
+    try {
+      const res = await fetch(`${apiBase}/${id}`, {
+        method: "PATCH",
+        body: formData,
+      });
+      const data = (await res.json()) as {
+        item?: ContentItem;
+        error?: string;
+      };
+      if (!res.ok || !data.item) {
+        throw new Error(data.error || "수정에 실패했습니다.");
+      }
+      const updated = data.item;
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? updated : item))
+      );
+      setEditingId(null);
+    } catch (err) {
+      setEditError(
+        err instanceof Error ? err.message : "수정 중 오류가 발생했습니다."
+      );
+    } finally {
+      setEditSubmitting(false);
     }
   }
 
@@ -152,57 +213,143 @@ export default function AdminDashboard({
         </form>
 
         <div>
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="제목으로 검색"
               className="w-full max-w-xs rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm outline-none transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
             />
-            <p className="shrink-0 text-xs font-semibold text-slate-400">
-              {filteredItems.length}개 표시 중
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="text-xs font-semibold text-slate-400">
+                {filteredItems.length}개 표시 중
+              </p>
+              <button
+                type="button"
+                onClick={handleDeleteSelected}
+                disabled={selectedIds.size === 0 || deletingSelection}
+                title={
+                  selectedIds.size > 0
+                    ? `선택한 ${selectedIds.size}개 삭제`
+                    : "삭제할 항목을 선택하세요"
+                }
+                className="flex items-center gap-1.5 rounded-full bg-red-50 px-3.5 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-300"
+              >
+                <TbTrash size={16} />
+                {deletingSelection
+                  ? "삭제 중..."
+                  : selectedIds.size > 0
+                  ? `삭제 (${selectedIds.size})`
+                  : "삭제"}
+              </button>
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100"
-              >
-                <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
-                  <Image
-                    src={`/api/media/${item.imageKey}`}
-                    alt={item.title}
-                    fill
-                    sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 100vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <p className="text-sm font-bold text-slate-900">
-                    {item.title}
-                  </p>
-                  {item.description && (
-                    <p className="mt-1 whitespace-pre-line text-xs leading-5 text-slate-500">
-                      {item.description}
-                    </p>
-                  )}
-                  <div className="mt-3 flex items-center justify-between">
-                    <p className="text-xs text-slate-400">
-                      {formatDate(item.createdAt)}
-                    </p>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      disabled={deletingId === item.id}
-                      className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
-                    >
-                      {deletingId === item.id ? "삭제 중..." : "삭제"}
-                    </button>
+            {filteredItems.map((item) => {
+              const isEditing = editingId === item.id;
+              return (
+                <div
+                  key={item.id}
+                  className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100"
+                >
+                  <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
+                    <Image
+                      src={`/api/media/${item.imageKey}`}
+                      alt={item.title}
+                      fill
+                      sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 100vw"
+                      className="object-cover"
+                    />
+                    <label className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-md bg-white/90 shadow-sm">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(item.id)}
+                        onChange={() => toggleSelected(item.id)}
+                        className="h-4 w-4 accent-blue-600"
+                      />
+                    </label>
                   </div>
+
+                  {isEditing ? (
+                    <form
+                      onSubmit={(e) => handleEditSubmit(e, item.id)}
+                      className="space-y-2 p-4"
+                    >
+                      <input
+                        name="title"
+                        required
+                        defaultValue={item.title}
+                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                      />
+                      <textarea
+                        name="description"
+                        rows={2}
+                        defaultValue={item.description}
+                        placeholder="내용 (선택)"
+                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                      />
+                      <input
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        className="w-full text-xs text-slate-600"
+                      />
+                      {editError && (
+                        <p className="text-xs font-medium text-red-500">
+                          {editError}
+                        </p>
+                      )}
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          type="submit"
+                          disabled={editSubmitting}
+                          className="flex-1 rounded-full bg-blue-700 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                        >
+                          {editSubmitting ? "저장 중..." : "저장"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingId(null);
+                            setEditError("");
+                          }}
+                          className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="p-4">
+                      <p className="text-sm font-bold text-slate-900">
+                        {item.title}
+                      </p>
+                      {item.description && (
+                        <p className="mt-1 whitespace-pre-line text-xs leading-5 text-slate-500">
+                          {item.description}
+                        </p>
+                      )}
+                      <div className="mt-3 flex items-center justify-between">
+                        <p className="text-xs text-slate-400">
+                          {formatDate(item.createdAt)}
+                        </p>
+                        <button
+                          onClick={() => {
+                            setEditingId(item.id);
+                            setEditError("");
+                          }}
+                          className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200"
+                        >
+                          <TbPencil size={14} />
+                          수정
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {filteredItems.length === 0 && (
               <p className="col-span-full text-sm text-slate-400">
                 {items.length === 0 ? labels.empty : "검색 결과가 없습니다."}

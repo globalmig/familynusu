@@ -1,8 +1,14 @@
 import Image from "next/image";
+import Link from "next/link";
 import Reveal from "./Reveal";
 import { casesStore } from "@/lib/content";
 
-type CaseCard = { image: string; title: string; description?: string };
+type CaseCard = {
+  id?: string;
+  image: string;
+  title: string;
+  description?: string;
+};
 
 const FALLBACK_CASES: CaseCard[] = [
   { image: "/space/1.jpg", title: "옥상·베란다 방수" },
@@ -13,16 +19,21 @@ const FALLBACK_CASES: CaseCard[] = [
   { image: "/space/6.jpg", title: "하수구 막힘·역류" },
 ];
 
+const MAX_PREVIEW = 6;
+
 export default async function Cases() {
   const cases = await casesStore.list();
   const hasRealCases = cases.length > 0;
-  const items: CaseCard[] = hasRealCases
+  const allItems: CaseCard[] = hasRealCases
     ? cases.map((c) => ({
+        id: c.id,
         image: `/api/media/${c.imageKey}`,
         title: c.title,
         description: c.description,
       }))
     : FALLBACK_CASES;
+  const items = allItems.slice(0, MAX_PREVIEW);
+  const hasMore = allItems.length > MAX_PREVIEW;
 
   return (
     <section id="cases" className="bg-slate-50 py-16 sm:py-20">
@@ -40,9 +51,9 @@ export default async function Cases() {
         </Reveal>
 
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((c, i) => (
-            <Reveal key={`${c.title}-${i}`} delay={i * 70}>
-              <div className="h-full overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100">
+          {items.map((c, i) => {
+            const card = (
+              <div className="h-full overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100 transition-shadow hover:shadow-md">
                 <div className="relative aspect-4/3 overflow-hidden">
                   <Image
                     src={c.image}
@@ -63,9 +74,32 @@ export default async function Cases() {
                   )}
                 </div>
               </div>
-            </Reveal>
-          ))}
+            );
+
+            return (
+              <Reveal key={c.id ?? `${c.title}-${i}`} delay={i * 70}>
+                {c.id ? (
+                  <Link href={`/cases/${c.id}`} className="block h-full">
+                    {card}
+                  </Link>
+                ) : (
+                  card
+                )}
+              </Reveal>
+            );
+          })}
         </div>
+
+        {hasMore && (
+          <div className="mt-10 flex justify-center">
+            <Link
+              href="/cases"
+              className="rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition-colors hover:border-orange-500 hover:text-orange-500"
+            >
+              자세히보기
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

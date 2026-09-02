@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { getContentStore } from "@/lib/content";
-
-const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+import { ImageValidationError, storeUploadedImage } from "@/lib/media";
 
 export async function GET(
   _request: Request,
@@ -54,26 +53,18 @@ export async function POST(
       { status: 400 }
     );
   }
-  if (!file.type.startsWith("image/")) {
-    return NextResponse.json(
-      { error: "이미지 파일만 업로드할 수 있습니다." },
-      { status: 400 }
-    );
-  }
-  if (file.size > MAX_IMAGE_SIZE) {
-    return NextResponse.json(
-      { error: "이미지 용량은 8MB 이하여야 합니다." },
-      { status: 400 }
-    );
-  }
 
   const { env } = await getCloudflareContext({ async: true });
-  const ext = (file.type.split("/")[1] || "jpg").replace(/[^a-z0-9]/gi, "");
-  const imageKey = `${namespace}-${crypto.randomUUID()}.${ext}`;
 
-  await env.CONTENT_BUCKET.put(imageKey, await file.arrayBuffer(), {
-    httpMetadata: { contentType: file.type },
-  });
+  let imageKey: string;
+  try {
+    imageKey = await storeUploadedImage(namespace, file, env.CONTENT_BUCKET);
+  } catch (err) {
+    if (err instanceof ImageValidationError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    throw err;
+  }
 
   const item = await store.create({
     title: title.trim(),
@@ -82,4 +73,36 @@ export async function POST(
   });
 
   return NextResponse.json({ item }, { status: 201 });
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ namespace: string }> }
+) {
+  const { namespace } = await params;
+  const store = getContentStore(namespace);
+  if (!store) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
+  }
+
+  const body = (await request.json().catch(() => null)) as {
+    ids?: unknown;
+  } | null;
+  const ids = Array.isArray(body?.ids)
+    ? body.ids.filter((id: unknown): id is string => typeof id === "string")
+    : [];
+
+  if (ids.length === 0) {
+    return NextResponse.json(
+      { error: "삭제할 항목을 선택해주세요." },
+      { status: 400 }
+    );
+  }
+
+  await store.removeMany(ids);
+  return NextResponse.json({ ok: true });
 }

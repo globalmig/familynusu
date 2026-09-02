@@ -2,7 +2,11 @@ import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // Cloudflare Workers has no sharp/image-optimization runtime, so
+    // next/image's built-in `/_next/image` optimizer 404s there.
+    unoptimized: true,
+  },
 };
 
 initOpenNextCloudflareForDev();

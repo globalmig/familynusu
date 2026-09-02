@@ -288,7 +288,7 @@ export default function AdminDashboard({
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {filteredItems.map((item) => (
           <div
             key={item.id}

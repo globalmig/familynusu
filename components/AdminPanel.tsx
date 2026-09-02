@@ -17,7 +17,7 @@ export default function AdminPanel({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-[1600px] px-4 py-10 sm:px-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-black text-slate-900">관리자 페이지</h1>
         <button

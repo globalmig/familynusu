@@ -8,18 +8,15 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  // 아래 두 바인딩은 실제 리소스를 만든 뒤 id/bucket_name을 채워주세요.
-  // 1) wrangler kv namespace create familynusu-cases  -> 나온 id를 kv_namespaces[0].id에 넣기
-  // 2) wrangler r2 bucket create familynusu-cases      -> bucket_name은 그대로 사용
   "kv_namespaces": [
     {
-      "binding": "CASES_KV",
-      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+      "binding": "CONTENT_KV",
+      "id": "8c451d2f79a64baaa6610b4feb627733"
     }
   ],
   "r2_buckets": [
     {
-      "binding": "CASES_BUCKET",
+      "binding": "CONTENT_BUCKET",
       "bucket_name": "familynusu-cases"
     }
   ]

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import AdminDashboard from "@/components/AdminDashboard";
 import AdminLogin from "@/components/AdminLogin";
+import AdminPanel from "@/components/AdminPanel";
 import { isAuthenticated } from "@/lib/admin-auth";
-import { listCases } from "@/lib/cases";
+import { casesStore } from "@/lib/content";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -15,6 +15,7 @@ export default async function AdminPage() {
     return <AdminLogin />;
   }
 
-  const cases = await listCases();
-  return <AdminDashboard initialCases={cases} />;
+  const cases = await casesStore.list();
+
+  return <AdminPanel initialCases={cases} />;
 }

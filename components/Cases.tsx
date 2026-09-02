@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Reveal from "./Reveal";
-import { listCases } from "@/lib/cases";
+import { casesStore } from "@/lib/content";
 
-const FALLBACK_CASES = [
+type CaseCard = { image: string; title: string; description?: string };
+
+const FALLBACK_CASES: CaseCard[] = [
   { image: "/space/1.jpg", title: "옥상·베란다 방수" },
   { image: "/space/2.jpg", title: "화장실·욕실 누수" },
   { image: "/space/3.jpg", title: "주방·세면대 배관" },
@@ -12,12 +14,13 @@ const FALLBACK_CASES = [
 ];
 
 export default async function Cases() {
-  const cases = await listCases();
+  const cases = await casesStore.list();
   const hasRealCases = cases.length > 0;
-  const items = hasRealCases
+  const items: CaseCard[] = hasRealCases
     ? cases.map((c) => ({
-        image: `/api/cases/image/${c.imageKey}`,
+        image: `/api/media/${c.imageKey}`,
         title: c.title,
+        description: c.description,
       }))
     : FALLBACK_CASES;
 
@@ -36,21 +39,29 @@ export default async function Cases() {
           </p>
         </Reveal>
 
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((c, i) => (
             <Reveal key={`${c.title}-${i}`} delay={i * 70}>
-              <div className="group relative aspect-4/5 overflow-hidden rounded-3xl">
-                <Image
-                  src={c.image}
-                  alt={c.title}
-                  fill
-                  sizes="(min-width: 640px) 33vw, 50vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-transparent" />
-                <p className="absolute inset-x-0 bottom-0 p-4 text-base font-bold text-white drop-shadow break-keep sm:p-5 sm:text-lg">
-                  {c.title}
-                </p>
+              <div className="h-full overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100">
+                <div className="relative aspect-4/3 overflow-hidden">
+                  <Image
+                    src={c.image}
+                    alt={c.title}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                </div>
+                <div className="p-5">
+                  <p className="text-base font-bold text-slate-900">
+                    {c.title}
+                  </p>
+                  {c.description && (
+                    <p className="mt-1.5 whitespace-pre-line text-sm leading-6 text-slate-500">
+                      {c.description}
+                    </p>
+                  )}
+                </div>
               </div>
             </Reveal>
           ))}

@@ -6,7 +6,7 @@ export async function GET(
 ) {
   const { key } = await params;
   const { env } = await getCloudflareContext({ async: true });
-  const object = await env.CASES_BUCKET.get(decodeURIComponent(key));
+  const object = await env.CONTENT_BUCKET.get(decodeURIComponent(key));
 
   if (!object || !object.body) {
     return new Response("Not found", { status: 404 });

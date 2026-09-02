@@ -7,13 +7,14 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Local dev automatically emulates the Cloudflare KV/R2 bindings (via `.dev.vars`), so the 작업사례 admin feature works without any live Cloudflare resources.
+Open [http://localhost:3000](http://localhost:3000). Local dev automatically emulates the Cloudflare KV/R2 bindings (via `.dev.vars`), so the 작업사례 admin 기능은 별도의 실제 Cloudflare 리소스 없이도 동작합니다.
 
-## 작업사례(admin) 기능
+## 관리자(admin) 기능
 
-- `/admin` — 비밀번호로 로그인하면 사진+글로 작업사례를 등록/삭제할 수 있는 관리자 페이지입니다.
+- `/admin` — 비밀번호로 로그인하면 "작업사례" 탭에서 사진+제목+설명을 등록/삭제할 수 있는 관리자 페이지입니다.
 - 로그인 비밀번호는 `ADMIN_PASSWORD` 환경변수입니다. 로컬 개발용 값은 `.env.local` / `.dev.vars`에 있습니다. **배포 전 반드시 변경**하고, 대표님께 안전하게 전달해주세요.
-- 등록된 사진은 Cloudflare R2에, 제목/설명은 Cloudflare KV에 저장됩니다. 홈페이지 "작업 분야" 섹션은 등록된 사례가 있으면 그것을 보여주고, 없으면 기존 예시 이미지를 보여줍니다.
+- 사진은 Cloudflare R2(`CONTENT_BUCKET`)에, 제목/설명은 Cloudflare KV(`CONTENT_KV`)에 저장됩니다.
+  - 홈페이지 "작업 분야" 섹션(`#cases`)은 갤러리 카드 형태(이미지+제목+설명)로 표시되며, 등록된 작업사례가 있으면 그것을, 없으면 기존 예시 이미지를 보여줍니다.
 
 ## Cloudflare 배포 준비 (최초 1회)
 

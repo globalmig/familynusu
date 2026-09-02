@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export type ContentItem = {
@@ -74,10 +75,13 @@ export function createContentStore(namespace: string) {
     ]);
   }
 
-  async function get(id: string): Promise<ContentItem | null> {
+  // Cached per request: detail pages call this once via generateMetadata
+  // and again while rendering the page body, and it'd otherwise mean two
+  // round trips to KV for the same item on every visit.
+  const get = cache(async (id: string): Promise<ContentItem | null> => {
     const { env } = await getCloudflareContext({ async: true });
     return (await env.CONTENT_KV.get<ContentItem>(itemKey(id), "json")) ?? null;
-  }
+  });
 
   async function update(
     id: string,

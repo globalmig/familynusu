@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { TbPencil, TbPhotoUp, TbPlus, TbTrash, TbX } from "react-icons/tb";
 import type { ContentItem } from "@/lib/content-store";
-import type { ContentNamespace } from "@/lib/content";
+import { HOMEPAGE_PREVIEW_LIMIT, type ContentNamespace } from "@/lib/content";
 
 const LABELS: Record<
   ContentNamespace,
@@ -114,6 +114,11 @@ export default function AdminDashboard({
     if (!q) return items;
     return items.filter((item) => item.title.toLowerCase().includes(q));
   }, [items, query]);
+
+  const homepageVisibleIds = useMemo(
+    () => new Set(items.slice(0, HOMEPAGE_PREVIEW_LIMIT).map((item) => item.id)),
+    [items]
+  );
 
   async function handleCreateSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -232,7 +237,11 @@ export default function AdminDashboard({
         <div className="col-span-2 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:col-span-1">
           <p className="text-xs font-semibold text-slate-400">홈페이지 노출</p>
           <p className="mt-1 text-sm font-bold text-slate-900 sm:text-base">
-            {items.length > 0 ? "등록된 사례 표시 중" : "기본 예시 표시 중"}
+            {items.length === 0
+              ? "기본 예시 표시 중"
+              : items.length > HOMEPAGE_PREVIEW_LIMIT
+              ? `최신 ${HOMEPAGE_PREVIEW_LIMIT}개만 노출 중`
+              : "전체 노출 중"}
           </p>
         </div>
       </div>
@@ -301,6 +310,15 @@ export default function AdminDashboard({
                   className="h-4 w-4 accent-blue-600"
                 />
               </label>
+              <span
+                className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-[11px] font-bold shadow-sm ${
+                  homepageVisibleIds.has(item.id)
+                    ? "bg-blue-700 text-white"
+                    : "bg-white/90 text-slate-400"
+                }`}
+              >
+                {homepageVisibleIds.has(item.id) ? "홈 노출 중" : "홈 미노출"}
+              </span>
             </div>
 
             <div className="p-4">

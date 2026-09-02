@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
-import { casesStore } from "@/lib/content";
+import { casesStore, HOMEPAGE_PREVIEW_LIMIT } from "@/lib/content";
 
 type CaseCard = {
   id?: string;
@@ -19,8 +19,6 @@ const FALLBACK_CASES: CaseCard[] = [
   { image: "/space/6.jpg", title: "하수구 막힘·역류" },
 ];
 
-const MAX_PREVIEW = 6;
-
 export default async function Cases() {
   const cases = await casesStore.list();
   const hasRealCases = cases.length > 0;
@@ -32,8 +30,7 @@ export default async function Cases() {
         description: c.description,
       }))
     : FALLBACK_CASES;
-  const items = allItems.slice(0, MAX_PREVIEW);
-  const hasMore = allItems.length > MAX_PREVIEW;
+  const items = allItems.slice(0, HOMEPAGE_PREVIEW_LIMIT);
 
   return (
     <section id="cases" className="bg-slate-50 py-16 sm:py-20">
@@ -90,16 +87,14 @@ export default async function Cases() {
           })}
         </div>
 
-        {hasMore && (
-          <div className="mt-10 flex justify-center">
-            <Link
-              href="/cases"
-              className="rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition-colors hover:border-orange-500 hover:text-orange-500"
-            >
-              자세히보기
-            </Link>
-          </div>
-        )}
+        <div className="mt-10 flex justify-center">
+          <Link
+            href="/cases"
+            className="rounded-full bg-orange-500 px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-orange-600"
+          >
+            자세히보기
+          </Link>
+        </div>
       </div>
     </section>
   );

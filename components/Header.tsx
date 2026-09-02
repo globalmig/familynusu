@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { TbMenu2, TbX } from "react-icons/tb";
 import { site } from "@/lib/site-config";
 import { useConsult } from "./ConsultProvider";
@@ -11,9 +12,34 @@ const NAV_ITEMS = [
   { href: "#promise", label: "고객님과의 약속" },
   { href: "#why", label: "패밀리누수탐지?" },
   { href: "#area", label: "방문 가능 지역" },
-  { href: "#cases", label: "작업 사례" },
+  { href: "/cases", label: "작업 사례" },
   { href: "#faq", label: "자주 묻는 질문" },
 ];
+
+function NavLink({
+  href,
+  className,
+  onClick,
+  children,
+}: {
+  href: string;
+  className?: string;
+  onClick?: () => void;
+  children: ReactNode;
+}) {
+  if (href.startsWith("/")) {
+    return (
+      <Link href={href} onClick={onClick} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={href} onClick={onClick} className={className}>
+      {children}
+    </a>
+  );
+}
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -35,13 +61,13 @@ export default function Header() {
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 lg:flex">
           {NAV_ITEMS.map((item) => (
-            <a
+            <NavLink
               key={item.href}
               href={item.href}
               className="transition-colors hover:text-blue-700"
             >
               {item.label}
-            </a>
+            </NavLink>
           ))}
         </nav>
 
@@ -77,13 +103,13 @@ export default function Header() {
           <ul className="flex flex-col gap-3 text-sm font-medium text-slate-600">
             {NAV_ITEMS.map((item) => (
               <li key={item.href}>
-                <a
+                <NavLink
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                   className="block py-1"
                 >
                   {item.label}
-                </a>
+                </NavLink>
               </li>
             ))}
           </ul>
